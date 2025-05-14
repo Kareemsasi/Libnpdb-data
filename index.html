@@ -66,6 +66,14 @@
             background-color: #3498db;
             color: white;
         }
+        .compound-name-link { /* Style for clickable compound names */
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .compound-name-link:hover {
+            color: #2980b9;
+        }
         .placeholder-text {
             color: #777;
             font-style: italic;
@@ -86,6 +94,27 @@
         #paginationControls button:disabled {
             background-color: #bdc3c7;
             cursor: not-allowed;
+        }
+        #compoundDetails { /* Style for the new details section */
+            margin-top: 30px;
+            background-color: #fdfdfd;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            display: none; /* Initially hidden */
+        }
+        #compoundDetails h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e67e22;
+            padding-bottom: 5px;
+        }
+        #compoundDetails p {
+            margin-bottom: 10px;
+        }
+        #compoundDetails strong {
+            color: #3498db;
         }
     </style>
 </head>
@@ -114,6 +143,10 @@
                 <button id="prevBtn" onclick="prevPage()" disabled>Previous</button>
                 <button id="nextBtn" onclick="nextPage()" disabled>Next</button>
             </div>
+
+            <div id="compoundDetails">
+                <h2>Compound Details</h2>
+                </div>
         </main>
     </div>
     <script>
@@ -139,9 +172,11 @@
             const end = start + pageSize;
             const pageData = compoundData.slice(start, end);
 
-            pageData.forEach(compound => {
+            pageData.forEach((compound, index) => {
+                // Add a data attribute to store the original index in the compoundData array
+                const originalIndex = currentPage * pageSize + index;
                 const row = `<tr>
-                    <td>${compound['Compound Name']}</td>
+                    <td><span class="compound-name-link" data-index="${originalIndex}">${compound['Compound Name']}</span></td>
                     <td>${compound['LibNPDB ID']}</td>
                     <td>${compound['Species Name']}</td>
                     <td>${compound['Part of Organism Studied']}</td>
@@ -153,6 +188,9 @@
             document.getElementById('prevBtn').disabled = currentPage === 0;
             document.getElementById('nextBtn').disabled = end >= compoundData.length;
             document.getElementById('tableContainer').style.display = 'block';
+
+            // Hide compound details when rendering a new page
+            document.getElementById('compoundDetails').style.display = 'none';
         }
 
         function prevPage() {
@@ -168,6 +206,40 @@
                 renderPage();
             }
         }
+
+        // Function to display full compound details
+        function displayCompoundDetails(index) {
+            const detailsContainer = document.getElementById('compoundDetails');
+            const compound = compoundData[index];
+
+            if (compound) {
+                let detailsHTML = '<h2>Compound Details</h2>';
+                // Iterate over all keys in the compound object to display details
+                for (const key in compound) {
+                    if (compound.hasOwnProperty(key)) {
+                        detailsHTML += `<p><strong>${key}:</strong> ${compound[key]}</p>`;
+                    }
+                }
+                detailsContainer.innerHTML = detailsHTML;
+                detailsContainer.style.display = 'block'; // Show the details section
+            } else {
+                detailsContainer.innerHTML = '<h2>Compound Details</h2><p>Details not found.</p>';
+                detailsContainer.style.display = 'block';
+            }
+        }
+
+        // Add event listener to the table body to handle clicks on compound names
+        document.getElementById('compoundTableBody').addEventListener('click', function(event) {
+            const target = event.target;
+            // Check if the clicked element is a compound name link
+            if (target.classList.contains('compound-name-link')) {
+                const index = target.getAttribute('data-index');
+                if (index !== null) {
+                    displayCompoundDetails(parseInt(index, 10));
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
