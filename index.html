@@ -70,6 +70,23 @@
             color: #777;
             font-style: italic;
         }
+        #paginationControls {
+            text-align: center;
+            margin-top: 15px;
+        }
+        #paginationControls button {
+            padding: 8px 12px;
+            margin: 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #paginationControls button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -93,29 +110,62 @@
                     <tbody id="compoundTableBody"></tbody>
                 </table>
             </div>
+            <div id="paginationControls">
+                <button id="prevBtn" onclick="prevPage()" disabled>Previous</button>
+                <button id="nextBtn" onclick="nextPage()" disabled>Next</button>
+            </div>
         </main>
     </div>
     <script>
+        let currentPage = 0;
+        const pageSize = 10;
+        let compoundData = [];
+
         async function loadData() {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/Kareemsasi/Libnpdb-data/refs/heads/main/data.json');
                 if (!response.ok) throw new Error('Failed to load data');
-                const data = await response.json();
-                const tableBody = document.getElementById('compoundTableBody');
-                tableBody.innerHTML = '';
-                data.forEach(compound => {
-                    const row = `<tr>
-                        <td>${compound['Compound Name']}</td>
-                        <td>${compound['LibNPDB ID']}</td>
-                        <td>${compound['Species Name']}</td>
-                        <td>${compound['Part of Organism Studied']}</td>
-                        <td><a href="${compound['Reference Source Link']}" target="_blank">Link</a></td>
-                    </tr>`;
-                    tableBody.insertAdjacentHTML('beforeend', row);
-                });
-                document.getElementById('tableContainer').style.display = 'block';
+                compoundData = await response.json();
+                renderPage();
             } catch (error) {
                 console.error('Error:', error);
+            }
+        }
+
+        function renderPage() {
+            const tableBody = document.getElementById('compoundTableBody');
+            tableBody.innerHTML = '';
+            const start = currentPage * pageSize;
+            const end = start + pageSize;
+            const pageData = compoundData.slice(start, end);
+
+            pageData.forEach(compound => {
+                const row = `<tr>
+                    <td>${compound['Compound Name']}</td>
+                    <td>${compound['LibNPDB ID']}</td>
+                    <td>${compound['Species Name']}</td>
+                    <td>${compound['Part of Organism Studied']}</td>
+                    <td><a href="${compound['Reference Source Link']}" target="_blank" rel="noopener">Link</a></td>
+                </tr>`;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').disabled = end >= compoundData.length;
+            document.getElementById('tableContainer').style.display = 'block';
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderPage();
+            }
+        }
+
+        function nextPage() {
+            if ((currentPage + 1) * pageSize < compoundData.length) {
+                currentPage++;
+                renderPage();
             }
         }
     </script>
