@@ -102,6 +102,9 @@
             border-radius: 8px;
             padding: 20px;
             display: none; /* Initially hidden */
+            display: flex; /* Use flexbox for layout */
+            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+            gap: 20px; /* Space between details and image */
         }
         #compoundDetails h2 {
             color: #2c3e50;
@@ -109,6 +112,7 @@
             margin-bottom: 15px;
             border-bottom: 2px solid #e67e22;
             padding-bottom: 5px;
+            width: 100%; /* Make heading take full width */
         }
         #compoundDetails p {
             margin-bottom: 10px;
@@ -134,6 +138,47 @@
         }
         .reference-links a {
             margin-right: 10px; /* Space out the links */
+        }
+        .details-text { /* Container for text details */
+            flex: 1; /* Allow text to take available space */
+            min-width: 300px; /* Minimum width before wrapping */
+        }
+        .structure-image-container { /* Container for the 2D structure image */
+            flex-shrink: 0; /* Prevent image container from shrinking */
+            width: 300px; /* Fixed width for the image container */
+            max-width: 100%; /* Ensure it doesn't exceed parent width */
+            text-align: center; /* Center the image */
+            background-color: #eee; /* Light background for image area */
+            padding: 10px;
+            border-radius: 5px;
+            display: flex; /* Use flexbox for stacking 2D and 3D */
+            flex-direction: column; /* Stack images vertically */
+            gap: 10px; /* Space between images */
+        }
+        .structure-image-container img {
+            max-width: 100%; /* Ensure image fits within its container */
+            height: auto; /* Maintain aspect ratio */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .map-container { /* Container for the Google Map */
+            width: 100%; /* Take full width */
+            margin-top: 20px; /* Space above the map */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden; /* Hide overflow from border-radius */
+        }
+        .map-container h4 {
+            color: #2c3e50;
+            margin: 0;
+            padding: 10px;
+            background-color: #f4f7f6;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 300px; /* Fixed height for the map */
+            border: none;
         }
     </style>
 </head>
@@ -164,7 +209,6 @@
             </div>
 
             <div id="compoundDetails">
-                <h2>Details</h2>
                 </div>
         </main>
     </div>
@@ -195,7 +239,10 @@
                 // Add a data attribute to store the original index in the compoundData array
                 const originalIndex = currentPage * pageSize + index;
                 const row = `<tr>
-                    <td><span class="compound-name-link" data-index="${originalIndex}">${compound['Compound Name']}</span></td> <td><span class="libnpdb-id-link">${compound['LibNPDB ID']}</span></td> <td><span class="plant-name-link">${compound['Species Name']}</span></td> <td>${compound['Part of Organism Studied']}</td>
+                    <td><span class="compound-name-link" data-index="${originalIndex}">${compound['Compound Name']}</span></td>
+                    <td><span class="libnpdb-id-link">${compound['LibNPDB ID']}</span></td>
+                    <td><span class="plant-name-link">${compound['Species Name']}</span></td>
+                    <td>${compound['Part of Organism Studied']}</td>
                     <td><a href="${compound['Reference Source Link']}" target="_blank" rel="noopener">Link</a></td>
                 </tr>`;
                 tableBody.insertAdjacentHTML('beforeend', row);
@@ -223,35 +270,82 @@
             }
         }
 
-        // Function to display full compound details
+        // Function to display full compound details including 2D and 3D structures and a map
         function displayCompoundDetails(index) {
             const detailsContainer = document.getElementById('compoundDetails');
             const compound = compoundData[index];
 
             let detailsHTML = '<h2>Compound Details</h2>';
+            let detailsTextHTML = '<div class="details-text">'; // Container for text details
+            let structureImageHTML = '<div class="structure-image-container">'; // Container for images
+            let mapHTML = '<div class="map-container">'; // Container for the map
 
             if (compound) {
                 // Iterate over all keys in the compound object to display details
                 for (const key in compound) {
                     if (compound.hasOwnProperty(key)) {
                         // Handle links specifically
-                        if (key === 'Reference Source Link' || key === 'Wikipedia Link') {
+                        if (key === 'Reference Source Link') { // Reference Source Link
                              if (compound[key]) { // Check if the link exists
-                                detailsHTML += `<p><strong>${key}:</strong> <a href="${compound[key]}" target="_blank" rel="noopener">Link</a></p>`;
+                                detailsTextHTML += `<p><strong>${key}:</strong> <a href="${compound[key]}" target="_blank" rel="noopener">Link</a></p>`;
                              } else {
-                                detailsHTML += `<p><strong>${key}:</strong> Not available</p>`;
+                                detailsTextHTML += `<p><strong>${key}:</strong> Not available</p>`;
                              }
-                        } else {
-                            detailsHTML += `<p><strong>${key}:</strong> ${compound[key]}</p>`;
+                        } else if (key === 'Wikipedia Link') { // Wikipedia Link - Make it an active link
+                            if (compound[key]) { // Check if the link exists
+                                detailsTextHTML += `<p><strong>${key}:</strong> <a href="${compound[key]}" target="_blank" rel="noopener">${compound[key]}</a></p>`;
+                            } else {
+                                detailsTextHTML += `<p><strong>${key}:</strong> Not available</p>`;
+                            }
+                        }
+                        else if (key === 'Smile' && compound[key]) {
+                            // If a SMILES string exists, generate the PubChem 2D and 3D structure image URLs
+                            const smilesString = encodeURIComponent(compound[key]);
+                            const imageUrl2D = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${smilesString}/PNG`;
+                             const imageUrl3D = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${smilesString}/PNG?record_type=3d`; // URL for 3D structure
+
+                            structureImageHTML += `<h4>2D Structure</h4>`;
+                            structureImageHTML += `<img src="${imageUrl2D}" alt="2D Structure of ${compound['Compound Name'] || 'Compound'}" onerror="this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/333?text=2D+Structure+Not+Available';">`;
+
+                            structureImageHTML += `<h4>3D Structure</h4>`;
+                             structureImageHTML += `<img src="${imageUrl3D}" alt="3D Structure of ${compound['Compound Name'] || 'Compound'}" onerror="this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/333?text=3D+Structure+Not+Available';">`;
+
+
+                        } else if (key !== 'Smile') { // Display other keys in text details, excluding the Smile key itself
+                            detailsTextHTML += `<p><strong>${key}:</strong> ${compound[key]}</p>`;
                         }
                     }
                 }
+
+                // If no SMILES string was found, add a placeholder message for both structures
+                if (!compound['Smile']) {
+                     structureImageHTML += `<p>2D and 3D Structures Not Available (SMILES string missing)</p>`;
+                }
+
+                // --- Add Google Map ---
+                mapHTML += `<h4>Source Location</h4>`;
+                const place = compound['Place'] || '';
+                const country = compound['Source Country'] || 'Libya';
+                const locationQuery = encodeURIComponent(`${place}, ${country}`);
+                const mapUrl = `https://maps.google.com/maps?q=${locationQuery}&output=embed`;
+
+                mapHTML += `<iframe src="${mapUrl}" allowfullscreen="" loading="lazy"></iframe>`;
+                // --- End Google Map ---
+
+
             } else {
-                detailsHTML += '<p>Details not found.</p>';
+                detailsTextHTML += '<p>Details not found.</p>';
+                 structureImageHTML += `<p>2D and 3D Structures Not Available</p>`;
+                 mapHTML += `<h4>Source Location</h4><p>Location data not available.</p>`;
             }
 
-            detailsContainer.innerHTML = detailsHTML;
-            detailsContainer.style.display = 'block'; // Show the details section
+            detailsTextHTML += '</div>'; // Close details-text
+            structureImageHTML += '</div>'; // Close structure-image-container
+            mapHTML += '</div>'; // Close map-container
+
+            // Combine text details, image container, and map container
+            detailsContainer.innerHTML = detailsHTML + detailsTextHTML + structureImageHTML + mapHTML;
+            detailsContainer.style.display = 'flex'; // Show the details section using flexbox
         }
 
         // Function to display compounds associated with a specific plant
@@ -260,28 +354,35 @@
             const relatedCompounds = compoundData.filter(compound => compound['Species Name'] === plantName);
 
             // Add the count to the heading
-            let detailsHTML = `<h2>Compounds found in ${plantName} (${relatedCompounds.length})</h2>`;
+            let detailsHTML = '<h2>Details</h2>'; // Reset details HTML
+            let detailsTextHTML = '<div class="details-text">'; // Use only text container for plant/ID details
+
+            detailsTextHTML += `<h3>Compounds found in ${plantName} (${relatedCompounds.length})</h3>`;
+
 
             if (relatedCompounds.length > 0) {
                 relatedCompounds.forEach(compound => {
-                    detailsHTML += `<div class="compound-list-item">`;
-                    detailsHTML += `<p><strong>Compound Name:</strong> ${compound['Compound Name']}</p>`;
-                    detailsHTML += `<p><strong>LibNPDB ID:</strong> ${compound['LibNPDB ID']}</p>`;
+                    detailsTextHTML += `<div class="compound-list-item">`;
+                    detailsTextHTML += `<p><strong>Compound Name:</strong> ${compound['Compound Name']}</p>`;
+                    detailsTextHTML += `<p><strong>LibNPDB ID:</strong> ${compound['LibNPDB ID']}</p>`;
                     if (compound['Reference Source Link']) {
-                        detailsHTML += `<p><strong>Reference:</strong> <a href="${compound['Reference Source Link']}" target="_blank" rel="noopener">Link</a></p>`;
+                        detailsTextHTML += `<p><strong>Reference:</strong> <a href="${compound['Reference Source Link']}" target="_blank" rel="noopener">Link</a></p>`;
                     }
                     // Assuming 'Wikipedia Link' might exist in the data
                     if (compound['Wikipedia Link']) {
-                         detailsHTML += `<p><strong>Wikipedia:</strong> <a href="${compound['Wikipedia Link']}" target="_blank" rel="noopener">Link</a></p>`;
+                         detailsTextHTML += `<p><strong>Wikipedia:</strong> <a href="${compound['Wikipedia Link']}" target="_blank" rel="noopener">${compound['Wikipedia Link']}</a></p>`;
                     }
-                    detailsHTML += `</div>`;
+                    detailsTextHTML += `</div>`;
                 });
             } else {
-                detailsHTML += `<p>No compounds found for ${plantName}.</p>`;
+                detailsTextHTML += `<p>No compounds found for ${plantName}.</p>`;
             }
 
-            detailsContainer.innerHTML = detailsHTML;
-            detailsContainer.style.display = 'block'; // Show the details section
+            detailsTextHTML += '</div>'; // Close details-text
+
+            // For plant and ID details, we only show text, no image container
+            detailsContainer.innerHTML = detailsHTML + detailsTextHTML;
+            detailsContainer.style.display = 'block'; // Show the details section (block layout is fine here)
         }
 
         // Function to display plants associated with a specific LibNPDB ID
@@ -292,32 +393,38 @@
             // Get unique plant names
             const plantNames = [...new Set(relatedEntries.map(entry => entry['Species Name']))];
 
+             let detailsHTML = '<h2>Details</h2>'; // Reset details HTML
+            let detailsTextHTML = '<div class="details-text">'; // Use only text container for plant/ID details
+
             // Add the count of unique plants to the heading
-            let detailsHTML = `<h2>Plants containing LibNPDB ID ${libnpdbId} (${plantNames.length})</h2>`;
+            detailsTextHTML += `<h3>Plants containing LibNPDB ID ${libnpdbId} (${plantNames.length})</h3>`;
 
             if (plantNames.length > 0) {
-                detailsHTML += `<ul class="plant-list">`;
+                detailsTextHTML += `<ul class="plant-list">`;
                 plantNames.forEach(plant => {
-                    detailsHTML += `<li>${plant}</li>`;
+                    detailsTextHTML += `<li>${plant}</li>`;
                 });
-                detailsHTML += `</ul>`;
+                detailsTextHTML += `</ul>`;
 
                 // Add reference links
                 const uniqueReferences = [...new Set(relatedEntries.map(entry => entry['Reference Source Link']).filter(link => link))]; // Get unique non-empty links
                 if (uniqueReferences.length > 0) {
-                    detailsHTML += `<p><strong>References:</strong></p><div class="reference-links">`;
+                    detailsTextHTML += `<p><strong>References:</strong></p><div class="reference-links">`;
                     uniqueReferences.forEach((refLink, index) => {
-                        detailsHTML += `<a href="${refLink}" target="_blank" rel="noopener">source ${index + 1}</a>`;
+                        detailsTextHTML += `<a href="${refLink}" target="_blank" rel="noopener">source ${index + 1}</a>`;
                     });
-                    detailsHTML += `</div>`;
+                    detailsTextHTML += `</div>`;
                 }
 
             } else {
-                detailsHTML += `<p>No plants found for LibNPDB ID ${libnpdbId}.</p>`;
+                detailsTextHTML += `<p>No plants found for LibNPDB ID ${libnpdbId}.</p>`;
             }
 
-            detailsContainer.innerHTML = detailsHTML;
-            detailsContainer.style.display = 'block'; // Show the details section
+            detailsTextHTML += '</div>'; // Close details-text
+
+            // For plant and ID details, we only show text, no image container
+            detailsContainer.innerHTML = detailsHTML + detailsTextHTML;
+            detailsContainer.style.display = 'block'; // Show the details section (block layout is fine here)
         }
 
 
