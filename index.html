@@ -187,6 +187,29 @@
             height: 300px; /* Fixed height for the map */
             border: none;
         }
+        /* Style for the compound cards container */
+        .compound-cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px; /* Space between cards */
+            margin-top: 15px; /* Space below the heading */
+        }
+        /* Style for the compound cards */
+        .compound-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            flex: 1 1 300px; /* Flex properties for responsiveness */
+            box-sizing: border-box; /* Include padding and border in the element's total width */
+        }
+        .compound-card p {
+            margin: 5px 0;
+        }
+        .compound-card strong {
+             color: #333; /* Keep strong color consistent within the card */
+        }
     </style>
 </head>
 <body>
@@ -359,31 +382,32 @@
             const detailsContainer = document.getElementById('compoundDetails');
             const relatedCompounds = compoundData.filter(compound => compound['Species Name'] === plantName);
 
-            // Add the count to the heading
             let detailsHTML = '<h2>Details</h2>'; // Reset details HTML
             let detailsTextHTML = '<div class="details-text">'; // Use only text container for plant/ID details
 
             detailsTextHTML += `<h3>Compounds found in ${plantName} (${relatedCompounds.length})</h3>`;
 
+            // Start the flex container for the cards
+            detailsTextHTML += `<div class="compound-cards-container">`;
 
             if (relatedCompounds.length > 0) {
+                // Iterate through related compounds and create a card for each
                 relatedCompounds.forEach(compound => {
-                    detailsTextHTML += `<div class="compound-list-item">`;
+                    detailsTextHTML += `<div class="compound-card">`; // Start card
                     detailsTextHTML += `<p><strong>Compound Name:</strong> ${compound['Compound Name']}</p>`;
                     detailsTextHTML += `<p><strong>LibNPDB ID:</strong> ${compound['LibNPDB ID']}</p>`;
                     if (compound['Reference Source Link']) {
                         detailsTextHTML += `<p><strong>Reference:</strong> <a href="${compound['Reference Source Link']}" target="_blank" rel="noopener">Link</a></p>`;
+                    } else {
+                         detailsTextHTML += `<p><strong>Reference:</strong> Not available</p>`;
                     }
-                    // Assuming 'Wikipedia Link' might exist in the data
-                    if (compound['Wikipedia Link']) {
-                         detailsTextHTML += `<p><strong>Wikipedia:</strong> <a href="${compound['Wikipedia Link']}" target="_blank" rel="noopener">${compound['Wikipedia Link']}</a></p>`;
-                    }
-                    detailsTextHTML += `</div>`;
+                    detailsTextHTML += `</div>`; // End card
                 });
             } else {
                 detailsTextHTML += `<p>No compounds found for ${plantName}.</p>`;
             }
 
+            detailsTextHTML += `</div>`; // Close the flex container
             detailsTextHTML += '</div>'; // Close details-text
 
             // For plant and ID details, we only show text, no image container
