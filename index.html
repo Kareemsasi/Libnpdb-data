@@ -210,16 +210,6 @@
         .compound-card strong {
              color: #333; /* Keep strong color consistent within the card */
         }
-        /* Style for the compound card structure image */
-        .card-structure-image {
-            width: 65%; /* Reduced to 65% of the original size */
-            max-width: 195px; /* 65% of 300px = 195px */
-            height: auto;
-            display: block;
-            margin: 10px auto 5px auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
@@ -339,9 +329,7 @@
                         }
                         else if (key === 'Smile' && compound[key]) {
                             // If a SMILES string exists, generate the PubChem 2D and 3D structure image URLs
-                            // Clean the SMILES string by removing problematic characters
-                            let cleanedSmiles = compound[key].replace(/[\\\/]/g, '');
-                            const smilesString = encodeURIComponent(cleanedSmiles);
+                            const smilesString = encodeURIComponent(compound[key]);
                             const imageUrl2D = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${smilesString}/PNG`;
                              const imageUrl3D = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${smilesString}/PNG?record_type=3d`; // URL for 3D structure
 
@@ -408,23 +396,6 @@
                     detailsTextHTML += `<div class="compound-card">`; // Start card
                     detailsTextHTML += `<p><strong>Compound Name:</strong> ${compound['Compound Name']}</p>`;
                     detailsTextHTML += `<p><strong>LibNPDB ID:</strong> ${compound['LibNPDB ID']}</p>`;
-                    
-                    // Add 2D structure image to the card
-                    if (compound['Smile']) {
-                        // Clean the SMILES string by removing problematic characters
-                        let cleanedSmiles = compound['Smile'].replace(/[\\\/]/g, '');
-                        const smilesString = encodeURIComponent(cleanedSmiles);
-                        const imageUrl2D = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${smilesString}/PNG`;
-                        detailsTextHTML += `<img class="card-structure-image" src="${imageUrl2D}" alt="2D Structure of ${compound['Compound Name']}" onerror="this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/333?text=Structure+Not+Available'; if(compound['InChI']) {this.onerror=null; this.src='https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchi/' + encodeURIComponent(compound['InChI']) + '/PNG';}">`;
-                    } else if (compound['InChI']) {
-                        // Try InChI if SMILES is not available
-                        const inchiString = encodeURIComponent(compound['InChI']);
-                        const imageUrl2D = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchi/${inchiString}/PNG`;
-                        detailsTextHTML += `<img class="card-structure-image" src="${imageUrl2D}" alt="2D Structure of ${compound['Compound Name']}" onerror="this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/333?text=Structure+Not+Available';">`;
-                    } else {
-                        detailsTextHTML += `<img class="card-structure-image" src="https://placehold.co/300x300/e0e0e0/333?text=Structure+Not+Available" alt="Structure Not Available">`;
-                    }
-                    
                     if (compound['Reference Source Link']) {
                         detailsTextHTML += `<p><strong>Reference:</strong> <a href="${compound['Reference Source Link']}" target="_blank" rel="noopener">Link</a></p>`;
                     } else {
