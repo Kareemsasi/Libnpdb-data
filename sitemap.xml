@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://www.libnpdb.ly/</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/home</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/libnpdb-search</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/browse-libnpdb</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/drug-likeness</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/draw-structures</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/smiles-to-structure</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/moringa-oleifera-database</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/dashboard</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.libnpdb.ly/about-us</loc>
+  <lastmod>2025-05-26T17:29:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
+</urlset>
