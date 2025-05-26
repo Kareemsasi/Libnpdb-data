@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phytochemical Dashboard</title>
+    <meta name="viewport" content="width=1024">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Phytochemical Dashboard</h1>
+            <div id="last-updated" class="subtitle"></div>
+        </header>
+
+        <section class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Compounds</div>
+                <div class="card-value" id="total-compounds">-</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Plant Families</div>
+                <div class="card-value" id="total-families">-</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Countries</div>
+                <div class="card-value" id="total-countries">-</div>
+            </div>
+        </section>
+
+        <section class="charts-row">
+            <div class="chart-card">
+                <div class="chart-title">Compounds by Country</div>
+                <canvas id="countryChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Compounds by Family</div>
+                <canvas id="familyChart"></canvas>
+            </div>
+        </section>
+
+        <section class="charts-row">
+            <div class="chart-card">
+                <div class="chart-title">Compounds by Classification</div>
+                <canvas id="classificationChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Discovery Timeline</div>
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </section>
+
+        <section class="table-section">
+            <div class="table-title">Compound Details (Top 10)</div>
+            <div class="table-container">
+                <table id="compoundTable">
+                    <thead>
+                        <tr>
+                            <th>Compound Name</th>
+                            <th>Other Name</th>
+                            <th>Plant Name</th>
+                            <th>Family</th>
+                            <th>Country</th>
+                            <th>Year</th>
+                            <th>CID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html>
