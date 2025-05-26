@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Phytochemical Dashboard</title>
-    <meta name="viewport" content="width=1024">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -24,15 +24,15 @@
                 <div class="card-value" id="total-families">-</div>
             </div>
             <div class="card">
-                <div class="card-title">Countries</div>
-                <div class="card-value" id="total-countries">-</div>
+                <div class="card-title">Total Unique Compounds</div>
+                <div class="card-value" id="total-unique-compounds">-</div>
             </div>
         </section>
 
         <section class="charts-row">
             <div class="chart-card">
-                <div class="chart-title">Compounds by Country</div>
-                <canvas id="countryChart"></canvas>
+                <div class="chart-title">Compounds by City</div>
+                <canvas id="cityChart"></canvas>
             </div>
             <div class="chart-card">
                 <div class="chart-title">Compounds by Family</div>
@@ -52,7 +52,7 @@
         </section>
 
         <section class="table-section">
-            <div class="table-title">Compound Details (Top 10)</div>
+            <div class="table-title">Compound Details (last uploaded)</div>
             <div class="table-container">
                 <table id="compoundTable">
                     <thead>
@@ -67,8 +67,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data will be inserted here -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </section>
